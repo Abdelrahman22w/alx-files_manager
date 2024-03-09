@@ -4,8 +4,8 @@ import fs from 'fs';
 import path from 'path';
 import mime from 'mime-types';
 import dbClient from '../utils/db';
-import redisClient from '../utils/redis';
-import fileQueue from '../utils/worker';
+import fileQueue from '../worker';
+// import redisClient from '../utils/redis';
 
 class FilesController {
   static async postUpload(req, res) {
