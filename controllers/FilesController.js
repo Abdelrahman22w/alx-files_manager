@@ -107,7 +107,7 @@ class FilesController {
 
       const files = await dbClient.db.collection('files').aggregate([
         { $match: { parentId: ObjectId(parentId), userId: ObjectId(userId) } },
-        { $skip: parseInt(page) * 20 },
+        { $skip: parseInt(page, 10) * 20 },
         { $limit: 20 },
       ]).toArray();
 
