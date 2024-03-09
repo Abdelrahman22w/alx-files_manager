@@ -5,6 +5,7 @@ import path from 'path';
 import mime from 'mime-types';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+import fileQueue from '../utils/worker';
 
 class FilesController {
   static async postUpload(req, res) {
@@ -42,6 +43,11 @@ class FilesController {
         const folderPath = process.env.FOLDER_PATH || '/tmp/files_manager';
         localPath = path.join(folderPath, uuidv4());
         fs.writeFileSync(localPath, Buffer.from(data, 'base64'));
+
+        // Add a job to the Bull queue for generating thumbnails
+        if (type === 'image') {
+          await fileQueue.add({ userId, fileId: localPath });
+        }
       }
 
       const newFile = {
