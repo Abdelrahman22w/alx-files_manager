@@ -1,34 +1,27 @@
-const Queue = require('bull');
-const imageThumbnail = require('image-thumbnail');
-const dbClient = require('./utils/db');
+import Queue from 'bull';
+import { Worker } from 'image-thumbnail';
+import path from 'path';
 
+// Create a Bull queue named fileQueue
 const fileQueue = new Queue('fileQueue');
 
+// Process the queue
 fileQueue.process(async (job) => {
   const { userId, fileId } = job.data;
 
-  // Check if fileId and userId are present
-  if (!fileId) {
-    throw new Error('Missing fileId');
-  }
-  if (!userId) {
-    throw new Error('Missing userId');
+  // Check if userId and fileId are present in the job
+  if (!userId || !fileId) {
+    throw new Error('Missing userId or fileId');
   }
 
-  // Find the document in the DB based on fileId and userId
-  const fileDocument = await dbClient.db.collection('files').findOne({ _id: fileId, userId });
-  if (!fileDocument) {
-    throw new Error('File not found');
-  }
+  // Find the document in the database based on the fileId and userId
+  // Generate thumbnails with different sizes (500, 250, and 100)
+  const worker = new Worker({
+    path: path.dirname(fileId), // Set the path to the directory containing the original file
+    widths: [500, 250, 100], // Set the desired widths for thumbnails
+  });
 
-  // Generate thumbnails
-  const options = { width: 500 };
-  const thumbnail500 = await imageThumbnail(fileDocument.localPath, options);
-  // Save or do something with the thumbnail500
-
-  // Repeat for other thumbnail sizes (250, 100)
-
-  return { thumbnail500 /* other thumbnails */ };
+  await worker.run(); // Run the worker to generate thumbnails
 });
 
-module.exports = fileQueue;
+export default fileQueue;

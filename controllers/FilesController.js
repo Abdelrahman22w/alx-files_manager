@@ -5,7 +5,7 @@ import path from 'path';
 import mime from 'mime-types';
 import dbClient from '../utils/db';
 import fileQueue from '../worker';
-// import redisClient from '../utils/redis';
+import redisClient from '../utils/redis';
 
 class FilesController {
   static async postUpload(req, res) {
@@ -50,6 +50,13 @@ class FilesController {
         if (type === 'image') {
           await fileQueue.add({ userId, fileId: localPath });
         }
+      }
+
+      const token = req.headers.authorization;
+
+      const redisToken = await redisClient.get(`auth_${token}`);
+      if (!redisToken) {
+        return res.status(401).json({ error: 'Unauthorized' });
       }
 
       const newFile = {
