@@ -58,7 +58,7 @@ class FilesController {
         type,
         isPublic,
         parentId: ObjectId(parentId),
-        localPath: type !== 'folder' ? localPath : null,
+        localPath: type !== 'folder' && localPath,
       };
 
       const result = await dbClient.db.collection('files').insertOne(newFile);
