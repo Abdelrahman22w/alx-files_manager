@@ -25,4 +25,24 @@ fileQueue.process(async (job) => {
   return { thumbnail500 /* other thumbnails */ };
 });
 
-module.exports = fileQueue;
+// User Queue
+const userQueue = new Queue('userQueue');
+
+userQueue.process(async (job) => {
+  const { userId } = job.data;
+
+  if (!userId) {
+    throw new Error('Missing userId');
+  }
+
+  const userDocument = await dbClient.db.collection('users').findOne({ _id: userId });
+  if (!userDocument) {
+    throw new Error('User not found');
+  }
+
+  console.log(`Welcome ${userDocument.email}!`);
+
+  return { userId };
+});
+
+module.exports = { fileQueue, userQueue };
