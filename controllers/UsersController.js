@@ -1,6 +1,7 @@
 import sha1 from 'sha1';
 import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
+
 const { userQueue } = require('../worker');
 // import userQueue from '../worker';
 
