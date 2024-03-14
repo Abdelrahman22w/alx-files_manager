@@ -3,7 +3,6 @@ import redisClient from '../utils/redis';
 import dbClient from '../utils/db';
 
 const { userQueue } = require('../worker');
-// import userQueue from '../worker';
 
 class UsersController {
   static async postNew(req, res) {
@@ -21,7 +20,7 @@ class UsersController {
       const userExists = await dbClient.db.collection('users').findOne({ email });
 
       if (userExists) {
-        return res.status(400).json({ error: 'Already exist' });
+        return res.status(400).json({ error: 'Already exists' });
       }
 
       const hashedPassword = sha1(password);
